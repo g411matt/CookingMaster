@@ -16,6 +16,12 @@ public class CuttingBoard : Interactable
     private PreparedItem _prepPrefab = null;
 
     /// <summary>
+    /// progress bar for chopping time
+    /// </summary>
+    [SerializeField]
+    private ProgressBar _progressBar = null;
+
+    /// <summary>
     /// Time to chop ingredients in seconds
     /// </summary>
     [SerializeField, Tooltip("Chop time in seconds")]
@@ -63,6 +69,8 @@ public class CuttingBoard : Interactable
                     _inUse = true;
                     _currPlayer.LockPlayer();
                     _currentTime = 0;
+                    _progressBar.gameObject.SetActive(true);
+                    _progressBar.SetProgress(0);
                 }
                 // if given a prepared item, combine them or just take it if there isn't one already
                 else if (item is PreparedItem)
@@ -97,10 +105,12 @@ public class CuttingBoard : Interactable
         {
             // TODO: add visual progress bar
             _currentTime += Time.deltaTime;
+            _progressBar.SetProgress(_currentTime / _chopTime);
             if (_currentTime >= _chopTime)
             {
                 _currPlayer.UnlockPlayer();
                 _inUse = false;
+                _progressBar.gameObject.SetActive(false);
             }
         }
     }
