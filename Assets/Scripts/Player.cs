@@ -9,6 +9,7 @@ public class Player : MonoBehaviour
 {
     private Queue<GrabItem> _heldItems = new Queue<GrabItem>();
     private bool _positionLocked = false;
+    private Interactable _availableInteraction = null;
 
     public bool CanTakeItem()
     {
@@ -51,5 +52,23 @@ public class Player : MonoBehaviour
     public bool CanMove()
     {
         return !_positionLocked;
+    }
+
+    public void TryInteract()
+    {
+        if (_availableInteraction != null)
+        {
+            _availableInteraction.Interact(this);
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D col)
+    {
+        _availableInteraction = col.GetComponent<Interactable>();
+    }
+
+    void OnTriggerxit2D(Collider2D col)
+    {
+        _availableInteraction = null;
     }
 }
