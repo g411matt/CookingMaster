@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-/// <summary>
+﻿/// <summary>
 /// Holder to place held items down temporarily
 /// </summary>
 public class Plate : Interactable
@@ -22,6 +18,7 @@ public class Plate : Interactable
             if (player.HasItem())
             {
                 _heldItem = player.PlaceItem();
+                _heldItem.transform.SetParent(transform, false);
             }
         }
         else if (player.CanTakeItem())

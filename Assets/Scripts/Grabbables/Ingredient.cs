@@ -21,4 +21,6 @@ public class Ingredient : GrabItem
     [SerializeField]
     private Type _type = Type.A;
 
+    public Type IngredType { get { return _type; } }
+
 }

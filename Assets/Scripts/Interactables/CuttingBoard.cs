@@ -15,54 +15,82 @@ public class CuttingBoard : Interactable
     [SerializeField]
     private PreparedItem _prepPrefab = null;
 
-    [SerializeField]
+    /// <summary>
+    /// Time to chop ingredients in seconds
+    /// </summary>
+    [SerializeField, Tooltip("Chop time in seconds")]
     private float _chopTime = 3;
 
+    /// <summary>
+    /// holder for the current processed item
+    /// </summary>
     private PreparedItem _currentPrep = null;
 
+    /// <summary>
+    /// whether or not the board is chopping, board can't be interacted with while true
+    /// </summary>
     private bool _inUse = false;
+    /// <summary>
+    /// player reference for lock release during chopping
+    /// </summary>
     private Player _currPlayer = null;
+    /// <summary>
+    /// time spent chopping the current ingredient
+    /// </summary>
     private float _currentTime = 0;
 
+    /// <summary>
+    /// Handles interaction with a player, if the player has an item it takes it, otherwise it will give the player a prepared item if it has one
+    /// If given an ingredient, the player is locked in place while the ingredient is chopped, everything place on the same board will be combined
+    /// </summary>
     public override void Interact(Player player)
     {
-        if(!_inUse && player.HasItem())
+        if (!_inUse)
         {
-           var item = player.PlaceItem();
-           if (item is Ingredient)
-           {
-                _currPlayer = player;
-                BeginProcessIngredient(item as Ingredient);   
-           }
-           else if (item is PreparedItem)
+            if (player.HasItem())
             {
-                var prep = item as PreparedItem;
-                if (_currentPrep == null)
+                var item = player.PlaceItem();
+                // if given an ingredient make a prepared item if there isn't one, add the ingredient to it, then lock the player
+                if (item is Ingredient)
                 {
-                    _currentPrep = prep;
+                    _currPlayer = player;
+                    var ingredient = item as Ingredient;
+                    if (_currentPrep == null)
+                    {
+                        _currentPrep = GameObject.Instantiate<PreparedItem>(_prepPrefab, this.transform, false);
+                    }
+                    _currentPrep.AddIngredient(ingredient);
+                    _inUse = true;
+                    _currPlayer.LockPlayer();
+                    _currentTime = 0;
                 }
-                else
+                // if given a prepared item, combine them or just take it if there isn't one already
+                else if (item is PreparedItem)
                 {
-                    // add the contents of prep to _currentPrep
+                    var prep = item as PreparedItem;
+                    if (_currentPrep == null)
+                    {
+                        _currentPrep = prep;
+                        _currentPrep.transform.SetParent(transform, false);
+                    }
+                    else
+                    {
+                        _currentPrep.AddPreparedItem(prep);
+                    }
                 }
+            }
+            // if the player is empty handed give them the prepared item if it exists
+            else if(_currentPrep != null)
+            {
+                player.TryTakeItem(_currentPrep);
+                _currentPrep = null;
             }
         }
     }
 
-    private void BeginProcessIngredient(Ingredient ingredient)
-    {
-        if(_currentPrep == null)
-        {
-            _currentPrep = GameObject.Instantiate<PreparedItem>(_prepPrefab, this.transform, false);
-        }
-        _inUse = true;
-        _currPlayer.LockPlayer();
-        // add the ingredient to the prep
-        _currentTime = 0;
-        Destroy(ingredient.gameObject); // maybe save this and show it during chopping then get rid of it, or just show the prepared item
-    }
-
-
+    /// <summary>
+    /// used to track time for ingredient chopping
+    /// </summary>
     void Update()
     {
         if (_inUse)

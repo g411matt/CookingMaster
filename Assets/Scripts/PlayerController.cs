@@ -10,11 +10,13 @@ using UnityEngine;
 /// </summary>
 public class PlayerController : MonoBehaviour
 {
+    // references so we don't need an awake just to get them
     [Header("References")]
     [SerializeField]
     private Player _player = null;
     [SerializeField]
     private Rigidbody2D _rigidbody = null;
+    // hardcoded controls for the prototype, serialized to set differently for 2 players
     [Header("Keycodes")]
     [SerializeField]
     private KeyCode _left = KeyCode.A;
@@ -29,6 +31,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private KeyCode _pause = KeyCode.Escape;
     [Header("Modifiers")]
+    /// <summary>
+    /// multiplier for move speed
+    /// </summary>
     [SerializeField]
     private float _moveSpeed = 5;
 
@@ -46,25 +51,28 @@ public class PlayerController : MonoBehaviour
             // TODO: pause
             return;
         }
-        if (Input.GetKey(_left))
+        if (_player.CanMove())
         {
-            moveVector.x = -1;
-        }
-        else if (Input.GetKey(_right))
-        {
-            moveVector.x = 1;
-        }
+            if (Input.GetKey(_left))
+            {
+                moveVector.x = -1;
+            }
+            else if (Input.GetKey(_right))
+            {
+                moveVector.x = 1;
+            }
 
-        if (Input.GetKey(_up))
-        {
-            moveVector.y = 1;
-        }
-        else if (Input.GetKey(_down))
-        {
-            moveVector.y = -1;
-        }
+            if (Input.GetKey(_up))
+            {
+                moveVector.y = 1;
+            }
+            else if (Input.GetKey(_down))
+            {
+                moveVector.y = -1;
+            }
 
-        moveVector = moveVector.normalized * _moveSpeed;
+            moveVector = moveVector.normalized * _moveSpeed;
+        }
 
         _rigidbody.velocity = moveVector;
 
