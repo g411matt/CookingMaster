@@ -28,6 +28,11 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float _moveSpeed = 5;
     /// <summary>
+    /// multiplier for move speed boosted
+    /// </summary>
+    [SerializeField]
+    private float _boostSpeed = 8;
+    /// <summary>
     /// The player's currently held items, they can only hold 2 and always drop them in acquistion order
     /// </summary>
     private Queue<GrabItem> _heldItems = new Queue<GrabItem>();
@@ -44,6 +49,11 @@ public class Player : MonoBehaviour
     /// save the start position for resets
     /// </summary>
     private Vector3 _startPosition = Vector3.zero;
+
+    /// <summary>
+    /// flag for the speed boost powerup
+    /// </summary>
+    private bool _boostOn = false;
 
     void Awake()
     {
@@ -102,19 +112,19 @@ public class Player : MonoBehaviour
     }
 
     /// <summary>
-    /// locks the player in place
+    /// sets boost flag
     /// </summary>
-    public void LockPlayer()
+    public void EnableBoost(bool enable)
     {
-        _positionLocked = true;
+        _boostOn = enable;
     }
 
     /// <summary>
-    /// releases the player
+    /// locks the player in place
     /// </summary>
-    public void UnlockPlayer()
+    public void LockPlayer(bool locked)
     {
-        _positionLocked = false;
+        _positionLocked = locked;
     }
 
     /// <summary>
@@ -141,7 +151,7 @@ public class Player : MonoBehaviour
     /// </summary>
     public void SetMoveVelocity(Vector2 moveDirection)
     {
-        _rigidbody.velocity = moveDirection * _moveSpeed;
+        _rigidbody.velocity = moveDirection * (_boostOn ? _boostSpeed : _moveSpeed);
     }
 
     /// <summary>
@@ -151,6 +161,7 @@ public class Player : MonoBehaviour
     {
         transform.position = _startPosition;
         _rigidbody.velocity = Vector2.zero;
+        _boostOn = false;
         while (_heldItems.Count > 0)
         {
             Destroy(_heldItems.Dequeue().gameObject);

@@ -73,7 +73,11 @@ public class CustomerSeat : Interactable
                 // leave happy, add score
                 GameManager.Instance.AddPoints(500, player);
                 RemoveCustomer();
-                // TODO: drop a pickup
+                // if 70% time or more is left spawn a pickup
+                if(_waitTime / _initialWait >= .7f)
+                {
+                    GameManager.Instance.SpawnPickup(player);
+                }
             }
             else
             {

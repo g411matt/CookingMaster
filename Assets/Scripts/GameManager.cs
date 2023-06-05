@@ -5,6 +5,8 @@ using UnityEngine.UI;
 /// Handles setting the game state and managing the ui screens
 /// in the future ui handling should be done by a separate manager and more complex
 /// screens like the end screen should have their own monobehaviour
+/// Future: too much duplication for both players should write a script to 
+/// do all the player stuff and just run 2 of the script
 /// </summary>
 public class GameManager : MonoBehaviour
 {
@@ -45,6 +47,8 @@ public class GameManager : MonoBehaviour
     // references to all gameplay objects for reseting them
     [Header("Other References")]
     [SerializeField]
+    private PickupSpawner _pickupSpawner = null;
+    [SerializeField]
     private CustomerManager _customerManager = null;
     [SerializeField]
     private Interactable[] _interactables = null;
@@ -75,7 +79,12 @@ public class GameManager : MonoBehaviour
     /// player 2 score
     /// </summary>
     private int _p2Score = 0;
-    // Start is called before the first frame update
+
+    private bool _p1Boosting = false;
+    private bool _p2Boosting = false;
+    private float _p1BoostTime = 0;
+    private float _p2BoostTime = 0;
+
     void Awake()
     {
         if (_instance != null)
@@ -102,6 +111,7 @@ public class GameManager : MonoBehaviour
         _p2TimeTxt.text = $"Time: {Mathf.CeilToInt(_p2Time)}s";
         _p1ScoreTxt.text = $"Score: {_p1Score}";
         _p2ScoreTxt.text = $"Score: {_p2Score}";
+        _pickupSpawner.Reset();
         _customerManager.Reset();
         for(int i = 0; i < _interactables.Length; i++)
         {
@@ -169,12 +179,12 @@ public class GameManager : MonoBehaviour
         if(_p1Time <= 0)
         {
             _p1Time = 0;
-            _player1.LockPlayer();
+            _player1.LockPlayer(true);
         }
         if (_p2Time <= 0)
         {
             _p2Time = 0;
-            _player2.LockPlayer();
+            _player2.LockPlayer(true);
         }
         if(_p1Time == 0 && _p2Time == 0)
         {
@@ -182,7 +192,77 @@ public class GameManager : MonoBehaviour
         }
         _p1TimeTxt.text = $"Time: {Mathf.CeilToInt(_p1Time)}s";
         _p2TimeTxt.text = $"Time: {Mathf.CeilToInt(_p2Time)}s";
+
+        if (_p1Boosting)
+        {
+            _p1BoostTime -= Time.deltaTime;
+            if(_p1BoostTime <= 0)
+            {
+                _p1Boosting = false;
+                _player1.EnableBoost(false);
+            }
+        }
+        if (_p2Boosting)
+        {
+            _p2BoostTime -= Time.deltaTime;
+            if (_p2BoostTime <= 0)
+            {
+                _p2Boosting = false;
+                _player2.EnableBoost(false);
+            }
+        }
     }
+
+    /// <summary>
+    /// passthru to pickup spawner to spawn a pickup
+    /// </summary>
+    public void SpawnPickup(Player player)
+    {
+        _pickupSpawner.SpawnPickup(player);
+    }
+
+    /// <summary>
+    /// enables a player's boost speed for a time, resets the time if picked up again while active
+    /// </summary>
+    public void BoostPlayer(Player player)
+    {
+        if (player == _player1)
+        {
+            _p1BoostTime = 10;
+            _p1Boosting = true;
+            _player1.EnableBoost(true);
+        }
+        else if (player == _player2)
+        {
+            _p2BoostTime = 10;
+            _p2Boosting = true; 
+            _player2.EnableBoost(true);
+        }
+        else
+        {
+            Debug.LogWarning("Attempting to give boost to unknown player");
+        }
+    }
+
+    /// <summary>
+    /// Adds time to a player's timer via powerup
+    /// </summary>
+    public void AddTime(int time, Player player)
+    {
+        if (player == _player1)
+        {
+            _p1Time += time;
+        }
+        else if (player == _player2)
+        {
+            _p2Time += time;
+        }
+        else
+        {
+            Debug.LogWarning("Attempting to give time to unknown player");
+        }
+    }
+
     /// <summary>
     /// Add points to player 1 score, use negative to subtract points
     /// </summary>
@@ -217,6 +297,15 @@ public class GameManager : MonoBehaviour
         {
             Debug.LogWarning("Attempting to give points to unknown player");
         }
+    }
+
+    public bool IsPlayerOne(Player player)
+    {
+        return player == _player1;
+    }
+    public bool IsPlayerTwo(Player player)
+    {
+        return player == _player2;
     }
 
     /// <summary>

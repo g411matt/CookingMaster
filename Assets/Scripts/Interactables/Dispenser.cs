@@ -2,6 +2,7 @@
 
 /// <summary>
 /// Creates a designated ingredient and gives it to the player
+/// future: pool ingredients instead of creating and destroying them
 /// </summary>
 public class Dispenser : Interactable
 {

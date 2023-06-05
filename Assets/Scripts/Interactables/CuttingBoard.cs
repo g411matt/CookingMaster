@@ -67,7 +67,7 @@ public class CuttingBoard : Interactable
                     }
                     _currentPrep.AddIngredient(ingredient);
                     _inUse = true;
-                    _currPlayer.LockPlayer();
+                    _currPlayer.LockPlayer(true);
                     _currentTime = 0;
                     _progressBar.gameObject.SetActive(true);
                     _progressBar.SetProgress(0);
@@ -108,7 +108,7 @@ public class CuttingBoard : Interactable
             _progressBar.SetProgress(_currentTime / _chopTime);
             if (_currentTime >= _chopTime)
             {
-                _currPlayer.UnlockPlayer();
+                _currPlayer.LockPlayer(false);
                 _inUse = false;
                 _progressBar.gameObject.SetActive(false);
             }
