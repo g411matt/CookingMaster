@@ -34,6 +34,10 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     void Update()
     {
+        if (GameManager.Instance.State == GameManager.GameState.Waiting)
+        {
+            return;
+        }
         Vector2 moveVector = Vector2.zero;
         if (Input.GetKeyUp(_pause))
         {
@@ -65,7 +69,7 @@ public class PlayerController : MonoBehaviour
 
         _player.SetMoveVelocity(moveVector.normalized);
 
-        if (Input.GetKeyUp(_interact))
+        if (GameManager.Instance.State == GameManager.GameState.Playing && Input.GetKeyUp(_interact))
         {
             _player.TryInteract();
         }

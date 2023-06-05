@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
@@ -10,6 +12,22 @@ using UnityEngine.UI;
 /// </summary>
 public class GameManager : MonoBehaviour
 {
+    public enum GameState
+    {
+        Waiting,
+        Playing,
+        Paused
+    }
+    private class HighScorePair : IComparable<HighScorePair>
+    {
+        public int player = 0;
+        public int score = 0;
+
+        public int CompareTo(HighScorePair other)
+        {
+            return -score.CompareTo(other.score);
+        }
+    }
     /// <summary>
     /// singleton reference
     /// </summary>
@@ -44,6 +62,8 @@ public class GameManager : MonoBehaviour
     private Text _p1EndWinnerTxt = null;
     [SerializeField]
     private Text _p2EndWinnerTxt = null;
+    [SerializeField]
+    private Text[] _highScoreTxts = null;
     // references to all gameplay objects for reseting them
     [Header("Other References")]
     [SerializeField]
@@ -74,16 +94,41 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// player 1 score
     /// </summary>
-    private int _p1Score = 0;
+    public int _p1Score = 0;
     /// <summary>
     /// player 2 score
     /// </summary>
     private int _p2Score = 0;
 
+    /// <summary>
+    /// if player 1 is boosting
+    /// </summary>
     private bool _p1Boosting = false;
+    /// <summary>
+    /// if player 2 is boosting
+    /// </summary>
     private bool _p2Boosting = false;
+    /// <summary>
+    /// time remaining on player 1 boost
+    /// </summary>
     private float _p1BoostTime = 0;
+    /// <summary>
+    /// time remaining on player 2 boost
+    /// </summary>
     private float _p2BoostTime = 0;
+
+    /// <summary>
+    /// current game state
+    /// </summary>
+    private GameState _gameState = GameState.Waiting;
+
+    /// <summary>
+    /// high score list
+    /// saves 10 scores, currently not saved between reboots
+    /// </summary>
+    private List<HighScorePair> _highScores = new List<HighScorePair>();
+
+    public GameState State { get { return _gameState; } }
 
     void Awake()
     {
@@ -129,6 +174,7 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1;
         _startButton.gameObject.SetActive(false);
         _pauseBackground.gameObject.SetActive(false);
+        _gameState = GameState.Playing;
     }
 
     /// <summary>
@@ -141,6 +187,7 @@ public class GameManager : MonoBehaviour
         _endScreen.gameObject.SetActive(false);
         _pauseBackground.gameObject.SetActive(false);
         Time.timeScale = 1;
+        _gameState = GameState.Playing;
     }
 
     /// <summary>
@@ -149,6 +196,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void EndGame()
     {
+        _gameState = GameState.Waiting;
         Time.timeScale = 0;
         _playerUI.gameObject.SetActive(false);
         _endScreen.gameObject.SetActive(true);
@@ -170,10 +218,35 @@ public class GameManager : MonoBehaviour
             _p1EndWinnerTxt.gameObject.SetActive(true);
             _p2EndWinnerTxt.gameObject.SetActive(true);
         }
+
+        // update the high scores
+        _highScores.Add(new HighScorePair { player = 1, score = _p1Score });
+        _highScores.Add(new HighScorePair { player = 2, score = _p2Score });
+        _highScores.Sort();
+        while (_highScores.Count > _highScoreTxts.Length)
+        {
+            _highScores.RemoveAt(_highScores.Count - 1);
+        }
+        for(int i = 0; i < _highScoreTxts.Length; i++)
+        {
+            if (i < _highScores.Count)
+            {
+                _highScoreTxts[i].gameObject.SetActive(true);
+                _highScoreTxts[i].text = $"Player{_highScores[i].player}: {_highScores[i].score}";
+            }
+            else
+            {
+                _highScoreTxts[i].gameObject.SetActive(false);
+            }
+        }
     }
 
     void Update()
     {
+        if (_gameState != GameState.Playing)
+        {
+            return;
+        }
         _p1Time -= Time.deltaTime;
         _p2Time -= Time.deltaTime;
         if(_p1Time <= 0)
@@ -316,5 +389,6 @@ public class GameManager : MonoBehaviour
         Time.timeScale = pause ? 0 : 1;
         _pauseBackground.gameObject.SetActive(pause);
         _pauseTxt.gameObject.SetActive(pause);
+        _gameState = pause ? GameState.Paused : GameState.Playing;
     }
 }
