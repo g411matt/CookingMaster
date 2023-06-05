@@ -26,3 +26,11 @@ Pickups and vegetables should get set up with object pools for performance when 
 Would probably want to set up ScriptableObjects to hold a lot of the adjustable data, like score values, times, order recipes, etc.
 
 The input system would need proper building with rebindable keys and gamepad support
+
+Needs audio cues for interactions
+
+Went with 2d physics for the prototype, but depending on design decisions might need to change to 3d, would be best to get that decided earlier in development
+
+No camera movement presently, may be fine even in the final product or may want to add either auto or manual control depending on level size and structure
+
+Would probably consider additional prep methods besides the cutting board and means to create variety between rounds, i.e. different kitchens, different ingredient availability, different recipes
