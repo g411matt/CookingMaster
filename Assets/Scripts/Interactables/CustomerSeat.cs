@@ -71,7 +71,7 @@ public class CustomerSeat : Interactable
             if (item is PreparedItem && _order.IsMatch(item as PreparedItem))
             {
                 // leave happy, add score
-                GameManager.Instance.AddPoints(500, player);
+                GameManager.Instance.AddPoints(GameManager.Instance.OrderFilledPoints, player);
                 RemoveCustomer();
                 // if 70% time or more is left spawn a pickup
                 if(_waitTime / _initialWait >= .7f)
@@ -82,7 +82,7 @@ public class CustomerSeat : Interactable
             else
             {
                 // angry, lower score
-                GameManager.Instance.AddPoints(-500, player);
+                GameManager.Instance.AddPoints(GameManager.Instance.OrderFailedPoints*2, player);
                 _currentMult = _angryMult;
             }
             Destroy(item.gameObject);

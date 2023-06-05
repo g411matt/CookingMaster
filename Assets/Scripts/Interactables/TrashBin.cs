@@ -10,7 +10,7 @@ public class TrashBin : Interactable
         {
             var item = player.PlaceItem();
             Destroy(item.gameObject);
-            GameManager.Instance.AddPoints(-50, player);
+            GameManager.Instance.AddPoints(GameManager.Instance.TrashPoints, player);
         }
     }
 }

@@ -3292,7 +3292,12 @@ MonoBehaviour:
   _player1: {fileID: 115567600}
   _player2: {fileID: 605274646}
   _gameTime: 900
-  _p1Score: 0
+  _boostLength: 10
+  _orderFilledPoints: 500
+  _orderFailedPoints: -250
+  _trashPoints: -50
+  _pickupPoints: 50
+  _pickupTime: 15
 --- !u!1 &1027607251
 GameObject:
   m_ObjectHideFlags: 0

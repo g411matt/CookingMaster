@@ -76,12 +76,42 @@ public class GameManager : MonoBehaviour
     private Player _player1 = null;
     [SerializeField]
     private Player _player2 = null;
+    [Header("Variables")]
     /// <summary>
     /// default timer for a player
     /// </summary>
-    [Header("Variables")]
     [SerializeField]
     private float _gameTime = 900;
+    /// <summary>
+    /// length of boost pickup in seconds
+    /// </summary>
+    [SerializeField]
+    private float _boostLength = 10;
+    /// <summary>
+    /// point value for filling order
+    /// </summary>
+    [SerializeField]
+    private int _orderFilledPoints = 500;
+    /// <summary>
+    /// point value for failing order
+    /// </summary>
+    [SerializeField]
+    private int _orderFailedPoints = -250;
+    /// <summary>
+    /// point value for trashing order
+    /// </summary>
+    [SerializeField]
+    private int _trashPoints = -50;
+    /// <summary>
+    /// point value for pickups
+    /// </summary>
+    [SerializeField]
+    private int _pickupPoints = 50;
+    /// <summary>
+    /// time value for pickups
+    /// </summary>
+    [SerializeField]
+    private int _pickupTime = 15;
 
     /// <summary>
     /// player 1 time remaining
@@ -94,7 +124,7 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// player 1 score
     /// </summary>
-    public int _p1Score = 0;
+    private int _p1Score = 0;
     /// <summary>
     /// player 2 score
     /// </summary>
@@ -129,6 +159,12 @@ public class GameManager : MonoBehaviour
     private List<HighScorePair> _highScores = new List<HighScorePair>();
 
     public GameState State { get { return _gameState; } }
+
+    public int OrderFilledPoints { get { return _orderFilledPoints; } }
+    public int OrderFailedPoints { get { return _orderFailedPoints; } }
+    public int TrashPoints { get { return _trashPoints; } }
+    public int PickupPoints { get { return _pickupPoints; } }
+    public int PickupTime { get { return _pickupTime; } }
 
     void Awake()
     {
@@ -301,13 +337,13 @@ public class GameManager : MonoBehaviour
     {
         if (player == _player1)
         {
-            _p1BoostTime = 10;
+            _p1BoostTime = _boostLength;
             _p1Boosting = true;
             _player1.EnableBoost(true);
         }
         else if (player == _player2)
         {
-            _p2BoostTime = 10;
+            _p2BoostTime = _boostLength;
             _p2Boosting = true; 
             _player2.EnableBoost(true);
         }

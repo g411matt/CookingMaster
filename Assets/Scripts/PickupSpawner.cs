@@ -101,10 +101,10 @@ public class PickupSpawner : MonoBehaviour
                 GameManager.Instance.BoostPlayer(player);
                 break;
             case PickupType.Time:
-                GameManager.Instance.AddTime(15, player);
+                GameManager.Instance.AddTime(GameManager.Instance.PickupTime, player);
                 break;
             case PickupType.Score:
-                GameManager.Instance.AddPoints(50, player);
+                GameManager.Instance.AddPoints(GameManager.Instance.PickupPoints, player);
                 break;
         }
     }
