@@ -18,6 +18,16 @@ public class Player : MonoBehaviour
     [SerializeField]
     private Transform _slot2 = null;
     /// <summary>
+    /// rigidbody reference
+    /// </summary>
+    [SerializeField]
+    private Rigidbody2D _rigidbody = null;
+    /// <summary>
+    /// multiplier for move speed
+    /// </summary>
+    [SerializeField]
+    private float _moveSpeed = 5;
+    /// <summary>
     /// The player's currently held items, they can only hold 2 and always drop them in acquistion order
     /// </summary>
     private Queue<GrabItem> _heldItems = new Queue<GrabItem>();
@@ -29,6 +39,16 @@ public class Player : MonoBehaviour
     /// The interactable the player is currently in range of
     /// </summary>
     private Interactable _availableInteraction = null;
+
+    /// <summary>
+    /// save the start position for resets
+    /// </summary>
+    private Vector3 _startPosition = Vector3.zero;
+
+    void Awake()
+    {
+        _startPosition = transform.position;
+    }
 
     /// <summary>
     /// helper for checking if the player has inventory space
@@ -114,6 +134,28 @@ public class Player : MonoBehaviour
         {
             _availableInteraction.Interact(this);
         }
+    }
+
+    /// <summary>
+    /// Sets player's movement speed and direction
+    /// </summary>
+    public void SetMoveVelocity(Vector2 moveDirection)
+    {
+        _rigidbody.velocity = moveDirection * _moveSpeed;
+    }
+
+    /// <summary>
+    /// Resets the player back to their initial position
+    /// </summary>
+    public void Reset()
+    {
+        transform.position = _startPosition;
+        _rigidbody.velocity = Vector2.zero;
+        while (_heldItems.Count > 0)
+        {
+            Destroy(_heldItems.Dequeue().gameObject);
+        }
+        _positionLocked = false;
     }
 
     /// <summary>

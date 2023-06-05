@@ -29,4 +29,16 @@ public class Plate : Interactable
             }
         }
     }
+
+    /// <summary>
+    /// get rid of the held item to reset
+    /// </summary>
+    public override void Reset()
+    {
+        if (_heldItem != null)
+        {
+            Destroy(_heldItem.gameObject);
+            _heldItem = null;
+        }
+    }
 }

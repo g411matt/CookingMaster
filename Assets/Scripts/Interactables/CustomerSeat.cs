@@ -4,7 +4,6 @@ using UnityEngine;
 
 /// <summary>
 /// Interactable for serving a customer, will only accept items if there's a customer and will pass plated items to separate customer system to handle scoring
-/// TDOO: connect to customer system when built
 /// </summary>
 public class CustomerSeat : Interactable
 {
@@ -71,12 +70,15 @@ public class CustomerSeat : Interactable
             // player score will be adjusted one way or the other
             if (item is PreparedItem && _order.IsMatch(item as PreparedItem))
             {
-                // TODO: leave happy, add score
+                // leave happy, add score
+                GameManager.Instance.AddPoints(500, player);
                 RemoveCustomer();
+                // TODO: drop a pickup
             }
             else
             {
-                // TODO: angry, lower score
+                // angry, lower score
+                GameManager.Instance.AddPoints(-500, player);
                 _currentMult = _angryMult;
             }
             Destroy(item.gameObject);
@@ -130,9 +132,16 @@ public class CustomerSeat : Interactable
             _progressBar.SetProgress(_waitTime / _initialWait);
             if (_waitTime <= 0)
             {
-                // TODO: leave, lower scores
+                // leave, lower scores
+                GameManager.Instance.AddPointsP1(-250);
+                GameManager.Instance.AddPointsP2(-250);
                 RemoveCustomer();
             }
         }
+    }
+
+    public override void Reset()
+    {
+        RemoveCustomer();
     }
 }

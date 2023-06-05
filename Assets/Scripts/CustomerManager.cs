@@ -53,7 +53,10 @@ public class CustomerManager : MonoBehaviour
     /// </summary>
     public void EmptySeat(CustomerSeat seat)
     {
-        _availableSeats.Enqueue(seat);
+        if (!_availableSeats.Contains(seat))
+        {
+            _availableSeats.Enqueue(seat);
+        }
     }
 
     void Update()
@@ -82,5 +85,12 @@ public class CustomerManager : MonoBehaviour
                 _seatingTime = 0;
             }
         }
+    }
+
+    public void Reset()
+    {
+        // this is under the assumption that this should start running again immediately after timescale returns to normal after reset
+        // it would need a proper on/off switch in the future
+        _seatingTime = 0;
     }
 }

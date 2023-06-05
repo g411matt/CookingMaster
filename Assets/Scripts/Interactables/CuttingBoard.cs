@@ -114,4 +114,20 @@ public class CuttingBoard : Interactable
             }
         }
     }
+
+    /// <summary>
+    /// reset all flags and get rid of anything the board is holding
+    /// </summary>
+    public override void Reset()
+    {
+        _inUse = false;
+        _currPlayer = null;
+        _currentTime = 0;
+        _progressBar.gameObject.SetActive(false);
+        if (_currentPrep != null)
+        {
+            Destroy(_currentPrep.gameObject);
+            _currentPrep = null;
+        }
+    }
 }

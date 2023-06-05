@@ -6,4 +6,9 @@
 public abstract class Interactable : MonoBehaviour
 {
     public abstract void Interact(Player player);
+
+    public virtual void Reset()
+    {
+
+    }
 }
